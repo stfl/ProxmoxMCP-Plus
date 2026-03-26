@@ -61,15 +61,20 @@ This project is built upon the open-source project [ProxmoxMCP](https://github.c
 ## Installation
 
 ### Prerequisites
-- UV package manager (recommended)
-- Python 3.9 or higher
+
+**Choose your installation method:**
+- **Option 1 (Traditional)**: UV package manager + Python 3.9+
+- **Option 2 (Nix)**: Nix package manager with flakes enabled
+- **Option 3 (MCP Hub)**: MCP Hub compatible environment
+
+**All methods require:**
 - Git
 - Access to a Proxmox server with API token credentials
 
 Before starting, ensure you have:
 - [ ] Proxmox server hostname or IP
 - [ ] Proxmox API token (see [API Token Setup](#proxmox-api-token-setup))
-- [ ] UV installed (`pip install uv`)
+- [ ] Either UV (`pip install uv`) or Nix installed
 
 ### Option 1: Quick Install (Recommended)
 
@@ -132,6 +137,99 @@ Before starting, ensure you have:
    ```bash
    python -c "import proxmox_mcp; print('Installation OK')"
    ```
+
+### Option 2: Nix Flakes (Recommended for NixOS/Nix users)
+
+ProxmoxMCP-Plus can be installed and run directly using Nix flakes for a reproducible, declarative setup.
+
+#### Quick Start with Nix
+
+Run directly from GitHub without installation:
+```bash
+# Set your Proxmox configuration via environment variables
+export PROXMOX_HOST="your-proxmox-host"
+export PROXMOX_USER="username@pve"
+export PROXMOX_TOKEN_NAME="token-name"
+export PROXMOX_TOKEN_VALUE="token-value"
+
+# Run directly from GitHub
+nix run github:stfl/ProxmoxMCP-Plus
+```
+
+#### Using in Claude Desktop with Nix
+
+Add to your Claude Desktop configuration file:
+
+**Configuration file location:**
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Linux: `~/.config/Claude/claude_desktop_config.json`
+
+```json
+{
+    "mcpServers": {
+        "ProxmoxMCP-Plus": {
+            "command": "nix",
+            "args": [
+                "run",
+                "github:stfl/ProxmoxMCP-Plus"
+            ],
+            "env": {
+                "PROXMOX_HOST": "your-proxmox-host",
+                "PROXMOX_USER": "username@pve",
+                "PROXMOX_TOKEN_NAME": "token-name",
+                "PROXMOX_TOKEN_VALUE": "token-value",
+                "PROXMOX_PORT": "8006",
+                "PROXMOX_VERIFY_SSL": "false",
+                "PROXMOX_SERVICE": "PVE",
+                "LOG_LEVEL": "INFO"
+            }
+        }
+    }
+}
+```
+
+#### Install Locally with Nix
+
+```bash
+# Clone the repository
+git clone https://github.com/stfl/ProxmoxMCP-Plus.git
+cd ProxmoxMCP-Plus
+
+# Build the package
+nix build
+
+# Run the built package
+./result/bin/proxmox-mcp
+
+# Or enter a development shell
+nix develop
+```
+
+#### NixOS System Configuration
+
+For NixOS users, you can add ProxmoxMCP-Plus to your system configuration:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    proxmox-mcp-plus.url = "github:stfl/ProxmoxMCP-Plus";
+  };
+
+  outputs = { self, nixpkgs, proxmox-mcp-plus, ... }: {
+    nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        {
+          environment.systemPackages = [
+            proxmox-mcp-plus.packages.x86_64-linux.default
+          ];
+        }
+      ];
+    };
+  };
+}
+```
 
 ### Option 3: MCP Bundle (.mcpb) - Recommended for MCP Hubs
 
