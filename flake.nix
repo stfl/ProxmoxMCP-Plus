@@ -30,17 +30,7 @@
             paramiko
             anyio
             uvicorn
-            # These may need to be added or overridden
-            (python.pkgs.proxmoxer or (python.pkgs.buildPythonPackage rec {
-              pname = "proxmoxer";
-              version = "2.0.1";
-              src = python.pkgs.fetchPypi {
-                inherit pname version;
-                sha256 = pkgs.lib.fakeHash;
-              };
-              propagatedBuildInputs = [ python.pkgs.requests ];
-              doCheck = false;
-            }))
+            proxmoxer
           ];
 
           nativeCheckInputs = with python.pkgs; [

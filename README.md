@@ -205,32 +205,6 @@ nix build
 nix develop
 ```
 
-#### NixOS System Configuration
-
-For NixOS users, you can add ProxmoxMCP-Plus to your system configuration:
-
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    proxmox-mcp-plus.url = "github:stfl/ProxmoxMCP-Plus";
-  };
-
-  outputs = { self, nixpkgs, proxmox-mcp-plus, ... }: {
-    nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        {
-          environment.systemPackages = [
-            proxmox-mcp-plus.packages.x86_64-linux.default
-          ];
-        }
-      ];
-    };
-  };
-}
-```
-
 ### Option 3: MCP Bundle (.mcpb) - Recommended for MCP Hubs
 
 This project supports the `.mcpb` (MCP Bundle) format for easy, one-click distribution and installation on compatibles hubs (like the [MCP Hub](https://github.com/mcp-hub/mcp-hub)).
